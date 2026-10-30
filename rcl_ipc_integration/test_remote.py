@@ -71,6 +71,7 @@ def child(directory):
     assert received == EXPECTED, received
     node.destroy_node()
     rclpy.shutdown()
+    # zenoh may log to stdout before this line; the parent reads the last line.
     print(json.dumps({'remote_samples': sum(received.values())}))
 
 
@@ -120,7 +121,7 @@ def main():
             assert raw == EXPECTED, raw
             print(json.dumps({'typed_samples': sum(typed.values()),
                               'disabled_reader_samples': sum(raw.values()),
-                              'child': json.loads(output)}))
+                              'child': json.loads(output.splitlines()[-1])}))
         finally:
             if process.poll() is None:
                 process.kill()
